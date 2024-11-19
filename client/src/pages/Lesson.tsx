@@ -23,7 +23,7 @@ import ListenRespond from "../components/QuestionTypes/ListenRespond";
 import SummarizeConversation from "../components/QuestionTypes/SummarizeConversation";
 import ScoreIndicator from "../components/ScoreIndicator";
 
-const TOTAL_QUESTIONS = 5;
+const TOTAL_QUESTIONS = 19;
 
 const questionTypeLabels: Record<string, string> = {
   "read-select": "Read and Select",
