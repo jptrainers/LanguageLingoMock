@@ -1,14 +1,27 @@
 import type { Express } from "express";
 import { db } from "../db";
-import { questions, users, userProgress } from "@db/schema";
+import { questions, users, userProgress, type Question } from "@db/schema";
 import { eq, sql } from "drizzle-orm";
+
+interface QuestionResult {
+  id: number;
+  type: string;
+  question: string;
+  correctAnswer: string;
+  options: string[];
+  explanation: string | null;
+  difficulty: number;
+  language: string;
+  mediaUrl: string | null;
+  mediaType: string | null;
+}
 
 export function registerRoutes(app: Express) {
   // Get questions for a lesson
   app.get("/api/questions", async (req, res) => {
     try {
       // First, get one random question from each distinct type
-      const baseQuestions = await db.execute(sql`
+      const baseQuestions = await db.execute<QuestionResult>(sql`
         WITH RECURSIVE distinct_types AS (
           SELECT DISTINCT type FROM questions
         ),
@@ -27,26 +40,26 @@ export function registerRoutes(app: Express) {
 
       // If we don't have enough questions from distinct types,
       // fill with random questions of any type
-      if (baseQuestions.length < 5) {
-        const remainingCount = 5 - baseQuestions.length;
-        const additionalQuestions = await db.execute(sql`
+      if (baseQuestions.rows.length < 5) {
+        const remainingCount = 5 - baseQuestions.rows.length;
+        const additionalQuestions = await db.execute<QuestionResult>(sql`
           SELECT 
             id, type, question, correct_answer as "correctAnswer",
             options, explanation, difficulty, language,
             media_url as "mediaUrl", media_type as "mediaType"
           FROM questions 
-          WHERE id NOT IN (${sql.join(baseQuestions.map(q => q.id))})
+          WHERE id NOT IN (${sql.join(baseQuestions.rows.map(q => q.id))})
           ORDER BY RANDOM()
           LIMIT ${remainingCount}
         `);
         
         // Combine and shuffle all questions
-        const allQuestions = [...baseQuestions, ...additionalQuestions]
+        const allQuestions = [...baseQuestions.rows, ...additionalQuestions.rows]
           .sort(() => Math.random() - 0.5);
           
         res.json(allQuestions);
       } else {
-        res.json(baseQuestions);
+        res.json(baseQuestions.rows);
       }
     } catch (error) {
       console.error("Error fetching questions:", error);
