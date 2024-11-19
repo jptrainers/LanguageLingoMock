@@ -4,6 +4,7 @@ import { questions, users, userProgress, type Question } from "@db/schema";
 import { eq, sql } from "drizzle-orm";
 
 interface QuestionResult {
+  [key: string]: unknown;
   id: number;
   type: string;
   question: string;
@@ -63,7 +64,12 @@ export function registerRoutes(app: Express) {
       }
     } catch (error) {
       console.error("Error fetching questions:", error);
-      res.status(500).json({ error: "Failed to fetch questions" });
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      res.status(500).json({ 
+        error: "Failed to fetch questions",
+        details: errorMessage,
+        timestamp: new Date().toISOString()
+      });
     }
   });
 
@@ -97,7 +103,12 @@ export function registerRoutes(app: Express) {
 
       res.json({ success: true });
     } catch (error) {
-      res.status(500).json({ error: "Failed to update progress" });
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      res.status(500).json({ 
+        error: "Failed to update progress",
+        details: errorMessage,
+        timestamp: new Date().toISOString()
+      });
     }
   });
 }
