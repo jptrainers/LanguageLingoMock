@@ -7,9 +7,35 @@ import FillBlanks from "../components/QuestionTypes/FillBlanks";
 import ReadComplete from "../components/QuestionTypes/ReadComplete";
 import CompleteSentence from "../components/QuestionTypes/CompleteSentence";
 import HighlightAnswer from "../components/QuestionTypes/HighlightAnswer";
+import ReadAloud from "../components/QuestionTypes/ReadAloud";
+import ListenAndType from "../components/QuestionTypes/ListenAndType";
+import InteractiveReading from "../components/QuestionTypes/InteractiveReading";
+import WriteAboutPhoto from "../components/QuestionTypes/WriteAboutPhoto";
+import InteractiveWriting from "../components/QuestionTypes/InteractiveWriting";
+import ListenSpeak from "../components/QuestionTypes/ListenSpeak";
+import SpeakAboutPhoto from "../components/QuestionTypes/SpeakAboutPhoto";
+import ReadSpeak from "../components/QuestionTypes/ReadSpeak";
 import ScoreIndicator from "../components/ScoreIndicator";
 
 const TOTAL_QUESTIONS = 5;
+
+const questionTypeLabels: Record<string, string> = {
+  "read-select": "Read and Select",
+  "fill-blanks": "Fill in the Blanks",
+  "read-complete": "Read and Complete",
+  "complete-sentence": "Complete the Sentence",
+  "highlight-answer": "Highlight the Answer",
+  "read-aloud": "Read Aloud",
+  "listen-type": "Listen and Type",
+  "interactive-reading": "Interactive Reading",
+  "write-photo": "Write About Photo",
+  "interactive-writing": "Interactive Writing",
+  "listen-speak": "Listen and Speak",
+  "speak-photo": "Speak About Photo",
+  "read-speak": "Read and Speak",
+  "interactive-listening": "Interactive Listening",
+  "summarize-conversation": "Summarize Conversation"
+};
 
 export default function Lesson() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -77,17 +103,107 @@ export default function Lesson() {
       );
     }
 
+    // Display current question type
+    const QuestionTypeLabel = () => (
+      <div className="mb-4">
+        <span className="inline-block px-3 py-1 text-sm font-medium bg-primary/10 rounded-full">
+          Question Type: {questionTypeLabels[question.type] || question.type}
+        </span>
+      </div>
+    );
+
     switch (question.type) {
       case "read-select":
-        return <ReadSelect question={question} onAnswer={handleAnswer} />;
+        return (
+          <>
+            <QuestionTypeLabel />
+            <ReadSelect question={question} onAnswer={handleAnswer} />
+          </>
+        );
       case "fill-blanks":
-        return <FillBlanks question={question} onAnswer={handleAnswer} />;
+        return (
+          <>
+            <QuestionTypeLabel />
+            <FillBlanks question={question} onAnswer={handleAnswer} />
+          </>
+        );
       case "read-complete":
-        return <ReadComplete question={question} onAnswer={handleAnswer} />;
+        return (
+          <>
+            <QuestionTypeLabel />
+            <ReadComplete question={question} onAnswer={handleAnswer} />
+          </>
+        );
       case "complete-sentence":
-        return <CompleteSentence question={question} onAnswer={handleAnswer} />;
+        return (
+          <>
+            <QuestionTypeLabel />
+            <CompleteSentence question={question} onAnswer={handleAnswer} />
+          </>
+        );
       case "highlight-answer":
-        return <HighlightAnswer question={question} onAnswer={handleAnswer} />;
+        return (
+          <>
+            <QuestionTypeLabel />
+            <HighlightAnswer question={question} onAnswer={handleAnswer} />
+          </>
+        );
+      case "read-aloud":
+        return (
+          <>
+            <QuestionTypeLabel />
+            <ReadAloud question={question} onAnswer={handleAnswer} />
+          </>
+        );
+      case "listen-type":
+        return (
+          <>
+            <QuestionTypeLabel />
+            <ListenAndType question={question} onAnswer={handleAnswer} />
+          </>
+        );
+      case "interactive-reading":
+        return (
+          <>
+            <QuestionTypeLabel />
+            <InteractiveReading question={question} onAnswer={handleAnswer} />
+          </>
+        );
+      case "write-photo":
+        return (
+          <>
+            <QuestionTypeLabel />
+            <WriteAboutPhoto question={question} onAnswer={handleAnswer} />
+          </>
+        );
+      case "interactive-writing":
+        return (
+          <>
+            <QuestionTypeLabel />
+            <InteractiveWriting question={question} onAnswer={handleAnswer} />
+          </>
+        );
+      case "listen-speak":
+        return (
+          <>
+            <QuestionTypeLabel />
+            <ListenSpeak question={question} onAnswer={handleAnswer} />
+          </>
+        );
+      case "speak-photo":
+        return (
+          <>
+            <QuestionTypeLabel />
+            <SpeakAboutPhoto question={question} onAnswer={handleAnswer} />
+          </>
+        );
+      case "read-speak":
+        return (
+          <>
+            <QuestionTypeLabel />
+            <ReadSpeak question={question} onAnswer={handleAnswer} />
+          </>
+        );
       default:
         return (
           <div className="text-center text-red-500">

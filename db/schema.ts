@@ -4,13 +4,15 @@ import { z } from "zod";
 
 export const questions = pgTable("questions", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  type: text("type").notNull(), // read-select, fill-blanks, etc
+  type: text("type").notNull(), // read-select, fill-blanks, read-aloud, etc.
   question: text("question").notNull(),
   correctAnswer: text("correct_answer").notNull(),
-  options: jsonb("options").notNull(),
+  options: jsonb("options").notNull(), // For read-select: multiple choice options, for speak-photo: [imageUrl, ...vocabulary]
   explanation: text("explanation"),
   difficulty: integer("difficulty").notNull(),
-  language: text("language").notNull()
+  language: text("language").notNull(),
+  mediaUrl: text("media_url"), // For audio/image based questions
+  mediaType: text("media_type") // audio/image
 });
 
 export const userProgress = pgTable("user_progress", {
