@@ -15,6 +15,12 @@ import InteractiveWriting from "../components/QuestionTypes/InteractiveWriting";
 import ListenSpeak from "../components/QuestionTypes/ListenSpeak";
 import SpeakAboutPhoto from "../components/QuestionTypes/SpeakAboutPhoto";
 import ReadSpeak from "../components/QuestionTypes/ReadSpeak";
+import IdentifyIdea from "../components/QuestionTypes/IdentifyIdea";
+import TitlePassage from "../components/QuestionTypes/TitlePassage";
+import CompletePassage from "../components/QuestionTypes/CompletePassage";
+import InteractiveListening from "../components/QuestionTypes/InteractiveListening";
+import ListenRespond from "../components/QuestionTypes/ListenRespond";
+import SummarizeConversation from "../components/QuestionTypes/SummarizeConversation";
 import ScoreIndicator from "../components/ScoreIndicator";
 
 const TOTAL_QUESTIONS = 5;
@@ -33,8 +39,12 @@ const questionTypeLabels: Record<string, string> = {
   "listen-speak": "Listen and Speak",
   "speak-photo": "Speak About Photo",
   "read-speak": "Read and Speak",
+  "identify-idea": "Identify the Main Idea",
+  "title-passage": "Title the Passage",
+  "complete-passage": "Complete the Passage",
   "interactive-listening": "Interactive Listening",
-  "summarize-conversation": "Summarize Conversation"
+  "listen-respond": "Listen and Respond",
+  "summarize-conversation": "Summarize the Conversation"
 };
 
 export default function Lesson() {
@@ -202,6 +212,48 @@ export default function Lesson() {
           <>
             <QuestionTypeLabel />
             <ReadSpeak question={question} onAnswer={handleAnswer} />
+          </>
+        );
+      case "identify-idea":
+        return (
+          <>
+            <QuestionTypeLabel />
+            <IdentifyIdea question={question} onAnswer={handleAnswer} />
+          </>
+        );
+      case "title-passage":
+        return (
+          <>
+            <QuestionTypeLabel />
+            <TitlePassage question={question} onAnswer={handleAnswer} />
+          </>
+        );
+      case "complete-passage":
+        return (
+          <>
+            <QuestionTypeLabel />
+            <CompletePassage question={question} onAnswer={handleAnswer} />
+          </>
+        );
+      case "interactive-listening":
+        return (
+          <>
+            <QuestionTypeLabel />
+            <InteractiveListening question={question} onAnswer={handleAnswer} />
+          </>
+        );
+      case "listen-respond":
+        return (
+          <>
+            <QuestionTypeLabel />
+            <ListenRespond question={question} onAnswer={handleAnswer} />
+          </>
+        );
+      case "summarize-conversation":
+        return (
+          <>
+            <QuestionTypeLabel />
+            <SummarizeConversation question={question} onAnswer={handleAnswer} />
           </>
         );
       default:
