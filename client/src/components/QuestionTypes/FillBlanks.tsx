@@ -5,9 +5,10 @@ import { useState } from "react";
 interface Props {
   question: {
     question: string;
+    options: string[];
     correctAnswer: string;
   };
-  onAnswer: (correct: boolean) => void;
+  onAnswer: (correct: boolean, skipped?: boolean) => void;
 }
 
 export default function FillBlanks({ question, onAnswer }: Props) {
@@ -19,6 +20,10 @@ export default function FillBlanks({ question, onAnswer }: Props) {
     setTimeout(() => {
       onAnswer(answer.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim());
     }, 1500);
+  };
+
+  const handleSkip = () => {
+    onAnswer(false, true);
   };
 
   return (
@@ -39,13 +44,24 @@ export default function FillBlanks({ question, onAnswer }: Props) {
         }
       />
 
-      <Button
-        className="w-full"
-        disabled={!answer || showResult}
-        onClick={handleSubmit}
-      >
-        Check Answer
-      </Button>
+      <div className="space-y-2">
+        <Button
+          className="w-full"
+          disabled={!answer || showResult}
+          onClick={handleSubmit}
+        >
+          Check Answer
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="w-full"
+          disabled={showResult}
+          onClick={handleSkip}
+        >
+          Skip Question
+        </Button>
+      </div>
 
       {showResult && (
         <p className="text-sm text-muted-foreground">

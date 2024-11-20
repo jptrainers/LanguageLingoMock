@@ -8,7 +8,7 @@ interface Props {
     options: string[];
     correctAnswer: string;
   };
-  onAnswer: (correct: boolean) => void;
+  onAnswer: (correct: boolean, skipped?: boolean) => void;
 }
 
 export default function CompleteSentence({ question, onAnswer }: Props) {
@@ -31,6 +31,10 @@ export default function CompleteSentence({ question, onAnswer }: Props) {
     setTimeout(() => {
       onAnswer(answer === question.correctAnswer);
     }, 1500);
+  };
+
+  const handleSkip = () => {
+    onAnswer(false, true);
   };
 
   return (
@@ -75,13 +79,24 @@ export default function CompleteSentence({ question, onAnswer }: Props) {
         </div>
       </Card>
 
-      <Button
-        className="w-full"
-        disabled={selectedWords.length === 0 || showResult}
-        onClick={handleCheck}
-      >
-        Check Answer
-      </Button>
+      <div className="space-y-2">
+        <Button
+          className="w-full"
+          disabled={selectedWords.length === 0 || showResult}
+          onClick={handleCheck}
+        >
+          Check Answer
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="w-full"
+          disabled={showResult}
+          onClick={handleSkip}
+        >
+          Skip Question
+        </Button>
+      </div>
 
       {showResult && (
         <p className="text-sm text-muted-foreground">
