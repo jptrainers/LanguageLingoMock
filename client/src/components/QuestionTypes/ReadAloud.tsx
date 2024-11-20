@@ -9,7 +9,7 @@ interface Props {
     correctAnswer: string;
     options: string[];
   };
-  onAnswer: (correct: boolean) => void;
+  onAnswer: (correct: boolean, skipped?: boolean) => void;
 }
 
 export default function ReadAloud({ question, onAnswer }: Props) {
@@ -61,6 +61,10 @@ export default function ReadAloud({ question, onAnswer }: Props) {
     }, 1500);
   };
 
+  const handleSkip = () => {
+    onAnswer(false, true);
+  };
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -106,13 +110,24 @@ export default function ReadAloud({ question, onAnswer }: Props) {
         </div>
       </Card>
 
-      <Button
-        className="w-full"
-        disabled={!audioBlob || showResult}
-        onClick={handleSubmit}
-      >
-        Check Answer
-      </Button>
+      <div className="space-y-2">
+        <Button
+          className="w-full"
+          disabled={!audioBlob || showResult}
+          onClick={handleSubmit}
+        >
+          Check Answer
+        </Button>
+
+        <Button
+          variant="outline"
+          className="w-full"
+          disabled={showResult}
+          onClick={handleSkip}
+        >
+          Skip Question
+        </Button>
+      </div>
 
       {showResult && (
         <p className="text-sm text-muted-foreground text-center">
