@@ -9,6 +9,7 @@ interface Props {
     question: string;
     correctAnswer: string;
     options: string[];
+    explanation?: string;
   };
   onAnswer: (correct: boolean, skipped?: boolean) => void;
 }
@@ -19,6 +20,7 @@ export default function SpeakAboutPhoto({ question, onAnswer }: Props) {
   const [showResult, setShowResult] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [transcription, setTranscription] = useState<string>("");
 
   const suggestedWords = question.options.slice(1); // First option is image URL, rest are vocabulary
 
@@ -52,13 +54,15 @@ export default function SpeakAboutPhoto({ question, onAnswer }: Props) {
     if (mediaRecorder && mediaRecorder.state !== "inactive") {
       mediaRecorder.stop();
       setIsRecording(false);
+      // Simulating transcription
+      setTranscription(question.correctAnswer);
     }
   };
 
   const handleSubmit = () => {
     setShowResult(true);
     setTimeout(() => {
-      onAnswer(true); // For demonstration, always mark as correct
+      onAnswer(transcription.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim());
     }, 1500);
   };
 
@@ -159,6 +163,12 @@ export default function SpeakAboutPhoto({ question, onAnswer }: Props) {
         <div className="text-sm text-muted-foreground space-y-2">
           <p>Sample description:</p>
           <p>{question.correctAnswer}</p>
+          {question.explanation && (
+            <>
+              <p className="mt-2 font-medium">Explanation:</p>
+              <p>{question.explanation}</p>
+            </>
+          )}
         </div>
       )}
     </div>

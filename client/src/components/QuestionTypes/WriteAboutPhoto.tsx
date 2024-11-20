@@ -9,6 +9,7 @@ interface Props {
     question: string;
     correctAnswer: string;
     options: string[];
+    explanation?: string;
   };
   onAnswer: (correct: boolean, skipped?: boolean) => void;
 }
@@ -85,6 +86,12 @@ export default function WriteAboutPhoto({ question, onAnswer }: Props) {
         <div className="text-sm text-muted-foreground space-y-2">
           <p>Correct answer:</p>
           <p>{question.correctAnswer}</p>
+          {question.explanation && (
+            <>
+              <p className="mt-2 font-medium">Explanation:</p>
+              <p>{question.explanation}</p>
+            </>
+          )}
         </div>
       )}
     </div>

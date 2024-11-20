@@ -8,6 +8,7 @@ interface Props {
     question: string;
     correctAnswer: string;
     options: string[];
+    explanation?: string;
   };
   onAnswer: (correct: boolean, skipped?: boolean) => void;
 }
@@ -19,6 +20,7 @@ export default function ListenSpeak({ question, onAnswer }: Props) {
   const [showResult, setShowResult] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [playCount, setPlayCount] = useState(0);
+  const [transcription, setTranscription] = useState<string>("");
 
   const playAudio = () => {
     setIsPlaying(true);
@@ -60,13 +62,15 @@ export default function ListenSpeak({ question, onAnswer }: Props) {
     if (mediaRecorder && mediaRecorder.state !== "inactive") {
       mediaRecorder.stop();
       setIsRecording(false);
+      // Simulating transcription
+      setTranscription(question.correctAnswer);
     }
   };
 
   const handleSubmit = () => {
     setShowResult(true);
     setTimeout(() => {
-      onAnswer(true); // For demonstration, always mark as correct
+      onAnswer(transcription.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim());
     }, 1500);
   };
 
@@ -152,9 +156,16 @@ export default function ListenSpeak({ question, onAnswer }: Props) {
       </div>
 
       {showResult && (
-        <p className="text-sm text-muted-foreground text-center">
-          Great pronunciation!
-        </p>
+        <div className="text-sm text-muted-foreground space-y-2">
+          <p>Correct answer:</p>
+          <p>{question.correctAnswer}</p>
+          {question.explanation && (
+            <>
+              <p className="mt-2 font-medium">Explanation:</p>
+              <p>{question.explanation}</p>
+            </>
+          )}
+        </div>
       )}
     </div>
   );

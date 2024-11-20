@@ -8,6 +8,7 @@ interface Props {
     question: string;
     correctAnswer: string;
     options: string[];
+    explanation?: string;
   };
   onAnswer: (correct: boolean, skipped?: boolean) => void;
 }
@@ -17,6 +18,7 @@ export default function ReadAloud({ question, onAnswer }: Props) {
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [transcription, setTranscription] = useState<string>("");
 
   const startRecording = async () => {
     try {
@@ -41,7 +43,6 @@ export default function ReadAloud({ question, onAnswer }: Props) {
       setIsRecording(true);
     } catch (error) {
       console.error("Error accessing microphone:", error);
-      // Handle error appropriately
     }
   };
 
@@ -49,15 +50,15 @@ export default function ReadAloud({ question, onAnswer }: Props) {
     if (mediaRecorder && mediaRecorder.state !== "inactive") {
       mediaRecorder.stop();
       setIsRecording(false);
+      // Simulating transcription
+      setTranscription(question.correctAnswer);
     }
   };
 
   const handleSubmit = () => {
-    // In a real implementation, we would send the audio to a speech-to-text service
-    // and compare with the correct answer
     setShowResult(true);
     setTimeout(() => {
-      onAnswer(true); // For demonstration, always mark as correct
+      onAnswer(transcription.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim());
     }, 1500);
   };
 
@@ -130,9 +131,16 @@ export default function ReadAloud({ question, onAnswer }: Props) {
       </div>
 
       {showResult && (
-        <p className="text-sm text-muted-foreground text-center">
-          Great pronunciation!
-        </p>
+        <div className="text-sm text-muted-foreground space-y-2">
+          <p>Correct pronunciation:</p>
+          <p>{question.correctAnswer}</p>
+          {question.explanation && (
+            <>
+              <p className="mt-2 font-medium">Explanation:</p>
+              <p>{question.explanation}</p>
+            </>
+          )}
+        </div>
       )}
     </div>
   );
