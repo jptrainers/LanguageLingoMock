@@ -9,6 +9,7 @@ interface Props {
     question: string;
     correctAnswer: string;
     options: string[];
+    explanation?: string;
   };
   onAnswer: (correct: boolean, skipped?: boolean) => void;
 }
@@ -31,15 +32,13 @@ export default function InteractiveListening({ question, onAnswer }: Props) {
 
   const handleSubmit = () => {
     setShowResult(true);
-    setTimeout(() => {
-      // In a real implementation, we would use more sophisticated text analysis
-      onAnswer(answer.toLowerCase().includes(question.correctAnswer.toLowerCase()));
-    }, 1500);
   };
 
   const handleSkip = () => {
     onAnswer(false, true);
   };
+
+  const isCorrect = answer.toLowerCase().includes(question.correctAnswer.toLowerCase());
 
   return (
     <div className="space-y-4">
@@ -72,30 +71,46 @@ export default function InteractiveListening({ question, onAnswer }: Props) {
       </Card>
 
       <div className="space-y-2">
-        <Button
-          className="w-full"
-          disabled={!answer || showResult || playCount === 0}
-          onClick={handleSubmit}
-        >
-          Check Answer
-        </Button>
+        {!showResult ? (
+          <>
+            <Button
+              className="w-full"
+              disabled={!answer || playCount === 0}
+              onClick={handleSubmit}
+            >
+              Check Answer
+            </Button>
 
-        <Button
-          variant="outline"
-          className="w-full"
-          disabled={showResult}
-          onClick={handleSkip}
-        >
-          Skip Question
-        </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              disabled={showResult}
+              onClick={handleSkip}
+            >
+              Skip Question
+            </Button>
+          </>
+        ) : (
+          <div className="space-y-4">
+            <div className="text-sm text-muted-foreground space-y-2">
+              <p>Correct Answer:</p>
+              <p>{question.correctAnswer}</p>
+              {question.explanation && (
+                <>
+                  <p className="mt-2 font-medium">Explanation:</p>
+                  <p>{question.explanation}</p>
+                </>
+              )}
+            </div>
+            <Button
+              className="w-full"
+              onClick={() => onAnswer(isCorrect)}
+            >
+              Next Question
+            </Button>
+          </div>
+        )}
       </div>
-
-      {showResult && (
-        <div className="text-sm text-muted-foreground space-y-2">
-          <p>Correct transcript:</p>
-          <p>{question.correctAnswer}</p>
-        </div>
-      )}
     </div>
   );
 }
