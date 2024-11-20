@@ -21,8 +21,8 @@ export function registerRoutes(app: Express) {
   // Get questions for a lesson
   app.get("/api/questions", async (req, res) => {
     try {
-      // First, get one random question from each distinct type
-      const baseQuestions = await db.execute<QuestionResult>(sql`
+      // Get one random question from each type
+      const questions = await db.execute<QuestionResult>(sql`
         WITH RECURSIVE distinct_types AS (
           SELECT DISTINCT type FROM questions
         ),
@@ -36,32 +36,9 @@ export function registerRoutes(app: Express) {
         )
         SELECT * FROM random_questions
         ORDER BY RANDOM()
-        LIMIT 5
       `);
 
-      // If we don't have enough questions from distinct types,
-      // fill with random questions of any type
-      if (baseQuestions.rows.length < 5) {
-        const remainingCount = 5 - baseQuestions.rows.length;
-        const additionalQuestions = await db.execute<QuestionResult>(sql`
-          SELECT 
-            id, type, question, correct_answer as "correctAnswer",
-            options, explanation, difficulty, language,
-            media_url as "mediaUrl", media_type as "mediaType"
-          FROM questions 
-          WHERE id NOT IN (${sql.join(baseQuestions.rows.map(q => q.id))})
-          ORDER BY RANDOM()
-          LIMIT ${remainingCount}
-        `);
-        
-        // Combine and shuffle all questions
-        const allQuestions = [...baseQuestions.rows, ...additionalQuestions.rows]
-          .sort(() => Math.random() - 0.5);
-          
-        res.json(allQuestions);
-      } else {
-        res.json(baseQuestions.rows);
-      }
+      res.json(questions.rows);
     } catch (error) {
       console.error("Error fetching questions:", error);
       const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
