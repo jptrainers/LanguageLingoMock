@@ -50,6 +50,7 @@ const questionTypeLabels: Record<string, string> = {
 export default function Lesson() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [score, setScore] = useState(0);
+  const [skippedQuestions, setSkippedQuestions] = useState<number[]>([]);
 
   const { data: questions, isLoading, isError } = useQuery({
     queryKey: ["questions"],
@@ -92,8 +93,12 @@ export default function Lesson() {
     );
   }
 
-  const handleAnswer = (correct: boolean) => {
-    if (correct) setScore(score + 1);
+  const handleAnswer = (correct: boolean, skipped: boolean = false) => {
+    if (skipped) {
+      setSkippedQuestions([...skippedQuestions, currentQuestion]);
+    } else if (correct) {
+      setScore(score + 1);
+    }
     setCurrentQuestion(currentQuestion + 1);
   };
 
@@ -122,138 +127,143 @@ export default function Lesson() {
       </div>
     );
 
+    const props = {
+      question,
+      onAnswer: handleAnswer,
+    };
+
     switch (question.type) {
       case "read-select":
         return (
           <>
             <QuestionTypeLabel />
-            <ReadSelect question={question} onAnswer={handleAnswer} />
+            <ReadSelect {...props} />
           </>
         );
       case "fill-blanks":
         return (
           <>
             <QuestionTypeLabel />
-            <FillBlanks question={question} onAnswer={handleAnswer} />
+            <FillBlanks {...props} />
           </>
         );
       case "read-complete":
         return (
           <>
             <QuestionTypeLabel />
-            <ReadComplete question={question} onAnswer={handleAnswer} />
+            <ReadComplete {...props} />
           </>
         );
       case "complete-sentence":
         return (
           <>
             <QuestionTypeLabel />
-            <CompleteSentence question={question} onAnswer={handleAnswer} />
+            <CompleteSentence {...props} />
           </>
         );
       case "highlight-answer":
         return (
           <>
             <QuestionTypeLabel />
-            <HighlightAnswer question={question} onAnswer={handleAnswer} />
+            <HighlightAnswer {...props} />
           </>
         );
       case "read-aloud":
         return (
           <>
             <QuestionTypeLabel />
-            <ReadAloud question={question} onAnswer={handleAnswer} />
+            <ReadAloud {...props} />
           </>
         );
       case "listen-type":
         return (
           <>
             <QuestionTypeLabel />
-            <ListenAndType question={question} onAnswer={handleAnswer} />
+            <ListenAndType {...props} />
           </>
         );
       case "interactive-reading":
         return (
           <>
             <QuestionTypeLabel />
-            <InteractiveReading question={question} onAnswer={handleAnswer} />
+            <InteractiveReading {...props} />
           </>
         );
       case "write-photo":
         return (
           <>
             <QuestionTypeLabel />
-            <WriteAboutPhoto question={question} onAnswer={handleAnswer} />
+            <WriteAboutPhoto {...props} />
           </>
         );
       case "interactive-writing":
         return (
           <>
             <QuestionTypeLabel />
-            <InteractiveWriting question={question} onAnswer={handleAnswer} />
+            <InteractiveWriting {...props} />
           </>
         );
       case "listen-speak":
         return (
           <>
             <QuestionTypeLabel />
-            <ListenSpeak question={question} onAnswer={handleAnswer} />
+            <ListenSpeak {...props} />
           </>
         );
       case "speak-photo":
         return (
           <>
             <QuestionTypeLabel />
-            <SpeakAboutPhoto question={question} onAnswer={handleAnswer} />
+            <SpeakAboutPhoto {...props} />
           </>
         );
       case "read-speak":
         return (
           <>
             <QuestionTypeLabel />
-            <ReadSpeak question={question} onAnswer={handleAnswer} />
+            <ReadSpeak {...props} />
           </>
         );
       case "identify-idea":
         return (
           <>
             <QuestionTypeLabel />
-            <IdentifyIdea question={question} onAnswer={handleAnswer} />
+            <IdentifyIdea {...props} />
           </>
         );
       case "title-passage":
         return (
           <>
             <QuestionTypeLabel />
-            <TitlePassage question={question} onAnswer={handleAnswer} />
+            <TitlePassage {...props} />
           </>
         );
       case "complete-passage":
         return (
           <>
             <QuestionTypeLabel />
-            <CompletePassage question={question} onAnswer={handleAnswer} />
+            <CompletePassage {...props} />
           </>
         );
       case "interactive-listening":
         return (
           <>
             <QuestionTypeLabel />
-            <InteractiveListening question={question} onAnswer={handleAnswer} />
+            <InteractiveListening {...props} />
           </>
         );
       case "listen-respond":
         return (
           <>
             <QuestionTypeLabel />
-            <ListenRespond question={question} onAnswer={handleAnswer} />
+            <ListenRespond {...props} />
           </>
         );
       case "summarize-conversation":
         return (
           <>
             <QuestionTypeLabel />
-            <SummarizeConversation question={question} onAnswer={handleAnswer} />
+            <SummarizeConversation {...props} />
           </>
         );
       default:
@@ -282,7 +292,13 @@ export default function Lesson() {
     <div className="container mx-auto p-4 max-w-2xl">
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <Progress value={(currentQuestion / TOTAL_QUESTIONS) * 100} className="w-2/3" />
+          <div className="w-2/3">
+            <Progress value={(currentQuestion / TOTAL_QUESTIONS) * 100} className="mb-2" />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>Completed: {currentQuestion}/{TOTAL_QUESTIONS}</span>
+              <span>Skipped: {skippedQuestions.length}</span>
+            </div>
+          </div>
           <ScoreIndicator score={score} total={currentQuestion} />
         </div>
 
@@ -293,6 +309,9 @@ export default function Lesson() {
             <div className="text-center">
               <h2 className="text-2xl font-bold mb-4">Lesson Complete!</h2>
               <p>Your score: {score}/{TOTAL_QUESTIONS}</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Questions skipped: {skippedQuestions.length}
+              </p>
             </div>
           )}
         </Card>

@@ -8,7 +8,7 @@ interface Props {
     options: string[];
     correctAnswer: string;
   };
-  onAnswer: (correct: boolean) => void;
+  onAnswer: (correct: boolean, skipped?: boolean) => void;
 }
 
 export default function ReadSelect({ question, onAnswer }: Props) {
@@ -26,6 +26,10 @@ export default function ReadSelect({ question, onAnswer }: Props) {
     setTimeout(() => {
       onAnswer(selected === question.correctAnswer);
     }, 1500);
+  };
+
+  const handleSkip = () => {
+    onAnswer(false, true);
   };
 
   return (
@@ -54,13 +58,24 @@ export default function ReadSelect({ question, onAnswer }: Props) {
         ))}
       </div>
 
-      <Button
-        className="w-full"
-        disabled={!selected || showResult}
-        onClick={handleCheck}
-      >
-        Check Answer
-      </Button>
+      <div className="space-y-2">
+        <Button
+          className="w-full"
+          disabled={!selected || showResult}
+          onClick={handleCheck}
+        >
+          Check Answer
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="w-full"
+          disabled={showResult}
+          onClick={handleSkip}
+        >
+          Skip Question
+        </Button>
+      </div>
     </div>
   );
 }
