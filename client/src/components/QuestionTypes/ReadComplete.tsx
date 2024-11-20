@@ -9,6 +9,7 @@ interface Props {
     question: string;
     options: string[];
     correctAnswer: string;
+    explanation?: string;
   };
   onAnswer: (correct: boolean, skipped?: boolean) => void;
 }
@@ -20,9 +21,6 @@ export default function ReadComplete({ question, onAnswer }: Props) {
   const handleCheck = () => {
     if (!selected) return;
     setShowResult(true);
-    setTimeout(() => {
-      onAnswer(selected === question.correctAnswer);
-    }, 1500);
   };
 
   const handleSkip = () => {
@@ -64,22 +62,44 @@ export default function ReadComplete({ question, onAnswer }: Props) {
       </Card>
 
       <div className="space-y-2">
-        <Button
-          className="w-full"
-          disabled={!selected || showResult}
-          onClick={handleCheck}
-        >
-          Check Answer
-        </Button>
-        
-        <Button
-          variant="outline"
-          className="w-full"
-          disabled={showResult}
-          onClick={handleSkip}
-        >
-          Skip Question
-        </Button>
+        {!showResult ? (
+          <>
+            <Button
+              className="w-full"
+              disabled={!selected}
+              onClick={handleCheck}
+            >
+              Check Answer
+            </Button>
+            
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleSkip}
+            >
+              Skip Question
+            </Button>
+          </>
+        ) : (
+          <div className="space-y-4">
+            <div className="text-sm text-muted-foreground space-y-2">
+              <p>Correct Answer:</p>
+              <p>{question.correctAnswer}</p>
+              {question.explanation && (
+                <>
+                  <p className="mt-2 font-medium">Explanation:</p>
+                  <p>{question.explanation}</p>
+                </>
+              )}
+            </div>
+            <Button
+              className="w-full"
+              onClick={() => onAnswer(selected === question.correctAnswer)}
+            >
+              Next Question
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
