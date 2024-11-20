@@ -9,7 +9,7 @@ interface Props {
     options: string[];
     correctAnswer: string;
   };
-  onAnswer: (correct: boolean) => void;
+  onAnswer: (correct: boolean, skipped?: boolean) => void;
 }
 
 export default function CompletePassage({ question, onAnswer }: Props) {
@@ -34,62 +34,70 @@ export default function CompletePassage({ question, onAnswer }: Props) {
     }, 1500);
   };
 
+  const handleSkip = () => {
+    onAnswer(false, true);
+  };
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
-        <h3 className="text-xl font-semibold">Complete the Passage</h3>
-        <Card className="p-4">
-          <p className="text-lg leading-relaxed whitespace-pre-line">
-            {question.question}
-          </p>
-        </Card>
+        <h3 className="text-xl font-semibold">Complete the passage:</h3>
+        <p className="text-lg">{question.question}</p>
       </div>
 
       <Card className="p-4">
-        <div className="space-y-4">
-          <div className="min-h-[60px] p-3 border-2 border-dashed border-muted-foreground/25 rounded-lg">
-            {selectedWords.map((word, index) => (
-              <Badge
-                key={index}
-                variant="secondary"
-                className={`m-1 cursor-pointer ${
+        <div className="min-h-[60px] p-3 border-2 border-dashed border-muted-foreground/25 rounded-lg mb-4">
+          {selectedWords.map((word, index) => (
+            <span
+              key={index}
+              onClick={() => handleWordClick(word)}
+              className={`inline-block m-1 px-3 py-1 rounded-full cursor-pointer
+                ${
                   showResult
                     ? selectedWords.join(" ") === question.correctAnswer
                       ? "bg-green-100"
                       : "bg-red-100"
-                    : "hover:bg-primary/20"
+                    : "bg-primary/10 hover:bg-primary/20"
                 }`}
+            >
+              {word}
+            </span>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {question.options
+            .filter((word) => !selectedWords.includes(word))
+            .map((word, index) => (
+              <span
+                key={index}
                 onClick={() => handleWordClick(word)}
+                className="inline-block px-3 py-1 bg-muted rounded-full cursor-pointer hover:bg-muted/80"
               >
                 {word}
-              </Badge>
+              </span>
             ))}
-          </div>
-
-          <div className="flex flex-wrap gap-2">
-            {question.options
-              .filter((word) => !selectedWords.includes(word))
-              .map((word, index) => (
-                <Badge
-                  key={index}
-                  variant="outline"
-                  className="cursor-pointer hover:bg-muted"
-                  onClick={() => handleWordClick(word)}
-                >
-                  {word}
-                </Badge>
-              ))}
-          </div>
         </div>
       </Card>
 
-      <Button
-        className="w-full"
-        disabled={selectedWords.length === 0 || showResult}
-        onClick={handleCheck}
-      >
-        Check Answer
-      </Button>
+      <div className="space-y-2">
+        <Button
+          className="w-full"
+          disabled={selectedWords.length === 0 || showResult}
+          onClick={handleCheck}
+        >
+          Check Answer
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="w-full"
+          disabled={showResult}
+          onClick={handleSkip}
+        >
+          Skip Question
+        </Button>
+      </div>
 
       {showResult && (
         <div className="text-sm text-muted-foreground space-y-2">

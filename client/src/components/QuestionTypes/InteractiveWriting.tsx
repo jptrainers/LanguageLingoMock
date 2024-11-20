@@ -10,7 +10,7 @@ interface Props {
     correctAnswer: string;
     options: string[];
   };
-  onAnswer: (correct: boolean) => void;
+  onAnswer: (correct: boolean, skipped?: boolean) => void;
 }
 
 export default function InteractiveWriting({ question, onAnswer }: Props) {
@@ -29,6 +29,10 @@ export default function InteractiveWriting({ question, onAnswer }: Props) {
     setTimeout(() => {
       onAnswer(usedSuggestedWords >= 2 && answer.length >= 20);
     }, 1500);
+  };
+
+  const handleSkip = () => {
+    onAnswer(false, true);
   };
 
   return (
@@ -66,13 +70,24 @@ export default function InteractiveWriting({ question, onAnswer }: Props) {
         </div>
       </Card>
 
-      <Button
-        className="w-full"
-        disabled={answer.length < 20 || showResult}
-        onClick={handleSubmit}
-      >
-        Check Answer
-      </Button>
+      <div className="space-y-2">
+        <Button
+          className="w-full"
+          disabled={answer.length < 20 || showResult}
+          onClick={handleSubmit}
+        >
+          Check Answer
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="w-full"
+          disabled={showResult}
+          onClick={handleSkip}
+        >
+          Skip Question
+        </Button>
+      </div>
 
       {showResult && (
         <div className="text-sm text-muted-foreground space-y-2">

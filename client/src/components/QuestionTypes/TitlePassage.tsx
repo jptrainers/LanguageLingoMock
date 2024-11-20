@@ -10,7 +10,7 @@ interface Props {
     options: string[];
     correctAnswer: string;
   };
-  onAnswer: (correct: boolean) => void;
+  onAnswer: (correct: boolean, skipped?: boolean) => void;
 }
 
 export default function TitlePassage({ question, onAnswer }: Props) {
@@ -23,6 +23,10 @@ export default function TitlePassage({ question, onAnswer }: Props) {
     setTimeout(() => {
       onAnswer(selected === question.correctAnswer);
     }, 1500);
+  };
+
+  const handleSkip = () => {
+    onAnswer(false, true);
   };
 
   return (
@@ -66,20 +70,24 @@ export default function TitlePassage({ question, onAnswer }: Props) {
         </RadioGroup>
       </Card>
 
-      <Button
-        className="w-full"
-        disabled={!selected || showResult}
-        onClick={handleCheck}
-      >
-        Check Answer
-      </Button>
-
-      {showResult && (
-        <div className="text-sm text-muted-foreground space-y-2">
-          <p>Explanation:</p>
-          <p>{question.correctAnswer}</p>
-        </div>
-      )}
+      <div className="space-y-2">
+        <Button
+          className="w-full"
+          disabled={!selected || showResult}
+          onClick={handleCheck}
+        >
+          Check Answer
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="w-full"
+          disabled={showResult}
+          onClick={handleSkip}
+        >
+          Skip Question
+        </Button>
+      </div>
     </div>
   );
 }

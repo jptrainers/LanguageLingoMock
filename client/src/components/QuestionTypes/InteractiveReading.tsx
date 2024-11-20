@@ -10,7 +10,7 @@ interface Props {
     correctAnswer: string;
     options: string[];
   };
-  onAnswer: (correct: boolean) => void;
+  onAnswer: (correct: boolean, skipped?: boolean) => void;
 }
 
 export default function InteractiveReading({ question, onAnswer }: Props) {
@@ -23,6 +23,10 @@ export default function InteractiveReading({ question, onAnswer }: Props) {
     setTimeout(() => {
       onAnswer(selected === question.correctAnswer);
     }, 1500);
+  };
+
+  const handleSkip = () => {
+    onAnswer(false, true);
   };
 
   return (
@@ -63,13 +67,24 @@ export default function InteractiveReading({ question, onAnswer }: Props) {
         </RadioGroup>
       </Card>
 
-      <Button
-        className="w-full"
-        disabled={!selected || showResult}
-        onClick={handleCheck}
-      >
-        Check Answer
-      </Button>
+      <div className="space-y-2">
+        <Button
+          className="w-full"
+          disabled={!selected || showResult}
+          onClick={handleCheck}
+        >
+          Check Answer
+        </Button>
+        
+        <Button
+          variant="outline"
+          className="w-full"
+          disabled={showResult}
+          onClick={handleSkip}
+        >
+          Skip Question
+        </Button>
+      </div>
 
       {showResult && (
         <p className="text-sm text-muted-foreground">
