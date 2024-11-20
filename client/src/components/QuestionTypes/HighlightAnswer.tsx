@@ -7,6 +7,7 @@ interface Props {
     question: string;
     options: string[];
     correctAnswer: string;
+    explanation?: string;
   };
   onAnswer: (correct: boolean, skipped?: boolean) => void;
 }
@@ -26,17 +27,14 @@ export default function HighlightAnswer({ question, onAnswer }: Props) {
   };
 
   const handleCheck = () => {
-    const answer = highlighted.join(" ");
     setShowResult(true);
-    setTimeout(() => {
-      onAnswer(answer === question.correctAnswer);
-    }, 1500);
   };
 
   const handleSkip = () => {
     onAnswer(false, true);
   };
 
+  const isCorrect = highlighted.join(" ") === question.correctAnswer;
   const words = question.question.split(" ");
 
   return (
@@ -66,29 +64,45 @@ export default function HighlightAnswer({ question, onAnswer }: Props) {
       </Card>
 
       <div className="space-y-2">
-        <Button
-          className="w-full"
-          disabled={highlighted.length === 0 || showResult}
-          onClick={handleCheck}
-        >
-          Check Answer
-        </Button>
+        {!showResult ? (
+          <>
+            <Button
+              className="w-full"
+              disabled={highlighted.length === 0}
+              onClick={handleCheck}
+            >
+              Check Answer
+            </Button>
 
-        <Button
-          variant="outline"
-          className="w-full"
-          disabled={showResult}
-          onClick={handleSkip}
-        >
-          Skip Question
-        </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleSkip}
+            >
+              Skip Question
+            </Button>
+          </>
+        ) : (
+          <div className="space-y-4">
+            <div className="text-sm text-muted-foreground space-y-2">
+              <p>Correct Answer:</p>
+              <p>{question.correctAnswer}</p>
+              {question.explanation && (
+                <>
+                  <p className="mt-2 font-medium">Explanation:</p>
+                  <p>{question.explanation}</p>
+                </>
+              )}
+            </div>
+            <Button
+              className="w-full"
+              onClick={() => onAnswer(isCorrect)}
+            >
+              Next Question
+            </Button>
+          </div>
+        )}
       </div>
-
-      {showResult && (
-        <p className="text-sm text-muted-foreground">
-          Correct answer: {question.correctAnswer}
-        </p>
-      )}
     </div>
   );
 }
