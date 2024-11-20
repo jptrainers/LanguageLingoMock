@@ -17,17 +17,12 @@ export default function InteractiveWriting({ question, onAnswer }: Props) {
   const [answer, setAnswer] = useState("");
   const [showResult, setShowResult] = useState(false);
 
-  const suggestedWords = question.options; // Using options as suggested vocabulary
+  const suggestedWords = question.options;
 
   const handleSubmit = () => {
     setShowResult(true);
-    // In a real implementation, we would use more sophisticated text analysis
-    const usedSuggestedWords = suggestedWords.filter(word => 
-      answer.toLowerCase().includes(word.toLowerCase())
-    ).length;
-    
     setTimeout(() => {
-      onAnswer(usedSuggestedWords >= 2 && answer.length >= 20);
+      onAnswer(answer.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim());
     }, 1500);
   };
 
@@ -73,7 +68,7 @@ export default function InteractiveWriting({ question, onAnswer }: Props) {
       <div className="space-y-2">
         <Button
           className="w-full"
-          disabled={answer.length < 20 || showResult}
+          disabled={!answer || showResult}
           onClick={handleSubmit}
         >
           Check Answer
@@ -91,7 +86,7 @@ export default function InteractiveWriting({ question, onAnswer }: Props) {
 
       {showResult && (
         <div className="text-sm text-muted-foreground space-y-2">
-          <p>Sample answer:</p>
+          <p>Correct answer:</p>
           <p>{question.correctAnswer}</p>
         </div>
       )}

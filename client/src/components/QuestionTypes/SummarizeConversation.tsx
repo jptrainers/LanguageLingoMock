@@ -20,7 +20,7 @@ export default function SummarizeConversation({ question, onAnswer }: Props) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [playCount, setPlayCount] = useState(0);
 
-  const suggestedWords = question.options; // Using options as key vocabulary words
+  const suggestedWords = question.options;
 
   const playAudio = () => {
     setIsPlaying(true);
@@ -34,13 +34,8 @@ export default function SummarizeConversation({ question, onAnswer }: Props) {
 
   const handleSubmit = () => {
     setShowResult(true);
-    // In a real implementation, we would use NLP to evaluate the summary
-    const usedKeyWords = suggestedWords.filter(word => 
-      answer.toLowerCase().includes(word.toLowerCase())
-    ).length;
-    
     setTimeout(() => {
-      onAnswer(usedKeyWords >= 2 && answer.length >= 50);
+      onAnswer(answer.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim());
     }, 1500);
   };
 
@@ -99,7 +94,7 @@ export default function SummarizeConversation({ question, onAnswer }: Props) {
       <div className="space-y-2">
         <Button
           className="w-full"
-          disabled={answer.length < 50 || showResult || playCount === 0}
+          disabled={!answer || showResult || playCount === 0}
           onClick={handleSubmit}
         >
           Check Answer
@@ -117,7 +112,7 @@ export default function SummarizeConversation({ question, onAnswer }: Props) {
 
       {showResult && (
         <div className="text-sm text-muted-foreground space-y-2">
-          <p>Sample summary:</p>
+          <p>Correct summary:</p>
           <p>{question.correctAnswer}</p>
         </div>
       )}

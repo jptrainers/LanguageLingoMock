@@ -19,8 +19,6 @@ export default function ListenAndType({ question, onAnswer }: Props) {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const playAudio = () => {
-    // In a real implementation, we would play the audio file from the question
-    // For now, we'll use the Web Speech API for demonstration
     setIsPlaying(true);
     const utterance = new SpeechSynthesisUtterance(question.correctAnswer);
     utterance.onend = () => setIsPlaying(false);

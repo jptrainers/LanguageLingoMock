@@ -20,9 +20,8 @@ export default function WriteAboutPhoto({ question, onAnswer }: Props) {
 
   const handleSubmit = () => {
     setShowResult(true);
-    // In a real implementation, we would use NLP to evaluate the answer
     setTimeout(() => {
-      onAnswer(answer.length >= 20); // Simple length check for demonstration
+      onAnswer(answer.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim());
     }, 1500);
   };
 
@@ -46,7 +45,7 @@ export default function WriteAboutPhoto({ question, onAnswer }: Props) {
               </div>
             )}
             <img
-              src={question.options[0]} // Assuming the first option is the image URL
+              src={question.options[0]}
               alt="Write about this"
               className={`w-full h-full object-cover ${!imageLoaded ? 'opacity-0' : ''}`}
               onLoad={() => setImageLoaded(true)}
@@ -66,7 +65,7 @@ export default function WriteAboutPhoto({ question, onAnswer }: Props) {
       <div className="space-y-2">
         <Button
           className="w-full"
-          disabled={answer.length < 20 || showResult}
+          disabled={!answer || showResult}
           onClick={handleSubmit}
         >
           Check Answer
@@ -84,7 +83,7 @@ export default function WriteAboutPhoto({ question, onAnswer }: Props) {
 
       {showResult && (
         <div className="text-sm text-muted-foreground space-y-2">
-          <p>Sample answer:</p>
+          <p>Correct answer:</p>
           <p>{question.correctAnswer}</p>
         </div>
       )}
