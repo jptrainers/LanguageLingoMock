@@ -20,7 +20,6 @@ export default function SpeakAboutPhoto({ question, onAnswer }: Props) {
   const [showResult, setShowResult] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [transcription, setTranscription] = useState<string>("");
 
   const suggestedWords = question.options.slice(1); // First option is image URL, rest are vocabulary
 
@@ -54,16 +53,11 @@ export default function SpeakAboutPhoto({ question, onAnswer }: Props) {
     if (mediaRecorder && mediaRecorder.state !== "inactive") {
       mediaRecorder.stop();
       setIsRecording(false);
-      // Simulating transcription
-      setTranscription(question.correctAnswer);
     }
   };
 
   const handleSubmit = () => {
     setShowResult(true);
-    setTimeout(() => {
-      onAnswer(transcription.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim());
-    }, 1500);
   };
 
   const handleSkip = () => {
@@ -86,7 +80,7 @@ export default function SpeakAboutPhoto({ question, onAnswer }: Props) {
               </div>
             )}
             <img
-              src={question.options[0]} // First option is the image URL
+              src={question.options[0]}
               alt="Speak about this"
               className={`w-full h-full object-cover ${!imageLoaded ? 'opacity-0' : ''}`}
               onLoad={() => setImageLoaded(true)}
@@ -141,36 +135,45 @@ export default function SpeakAboutPhoto({ question, onAnswer }: Props) {
       </Card>
 
       <div className="space-y-2">
-        <Button
-          className="w-full"
-          disabled={!audioBlob || showResult}
-          onClick={handleSubmit}
-        >
-          Check Answer
-        </Button>
-
-        <Button
-          variant="outline"
-          className="w-full"
-          disabled={showResult}
-          onClick={handleSkip}
-        >
-          Skip Question
-        </Button>
+        {!showResult ? (
+          <>
+            <Button
+              className="w-full"
+              disabled={!audioBlob}
+              onClick={handleSubmit}
+            >
+              Check Answer
+            </Button>
+            
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleSkip}
+            >
+              Skip Question
+            </Button>
+          </>
+        ) : (
+          <div className="space-y-4">
+            <div className="text-sm text-muted-foreground space-y-2">
+              <p>Sample Answer:</p>
+              <p>{question.correctAnswer}</p>
+              {question.explanation && (
+                <>
+                  <p className="mt-2 font-medium">Explanation:</p>
+                  <p>{question.explanation}</p>
+                </>
+              )}
+            </div>
+            <Button
+              className="w-full"
+              onClick={() => onAnswer(true)}
+            >
+              Next Question
+            </Button>
+          </div>
+        )}
       </div>
-
-      {showResult && (
-        <div className="text-sm text-muted-foreground space-y-2">
-          <p>Sample description:</p>
-          <p>{question.correctAnswer}</p>
-          {question.explanation && (
-            <>
-              <p className="mt-2 font-medium">Explanation:</p>
-              <p>{question.explanation}</p>
-            </>
-          )}
-        </div>
-      )}
     </div>
   );
 }

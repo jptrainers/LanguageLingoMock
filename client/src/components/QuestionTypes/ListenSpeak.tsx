@@ -20,7 +20,6 @@ export default function ListenSpeak({ question, onAnswer }: Props) {
   const [showResult, setShowResult] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [playCount, setPlayCount] = useState(0);
-  const [transcription, setTranscription] = useState<string>("");
 
   const playAudio = () => {
     setIsPlaying(true);
@@ -62,16 +61,11 @@ export default function ListenSpeak({ question, onAnswer }: Props) {
     if (mediaRecorder && mediaRecorder.state !== "inactive") {
       mediaRecorder.stop();
       setIsRecording(false);
-      // Simulating transcription
-      setTranscription(question.correctAnswer);
     }
   };
 
   const handleSubmit = () => {
     setShowResult(true);
-    setTimeout(() => {
-      onAnswer(transcription.toLowerCase().trim() === question.correctAnswer.toLowerCase().trim());
-    }, 1500);
   };
 
   const handleSkip = () => {
@@ -137,36 +131,45 @@ export default function ListenSpeak({ question, onAnswer }: Props) {
       </Card>
 
       <div className="space-y-2">
-        <Button
-          className="w-full"
-          disabled={!audioBlob || showResult}
-          onClick={handleSubmit}
-        >
-          Check Answer
-        </Button>
-
-        <Button
-          variant="outline"
-          className="w-full"
-          disabled={showResult}
-          onClick={handleSkip}
-        >
-          Skip Question
-        </Button>
+        {!showResult ? (
+          <>
+            <Button
+              className="w-full"
+              disabled={!audioBlob}
+              onClick={handleSubmit}
+            >
+              Check Answer
+            </Button>
+            
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleSkip}
+            >
+              Skip Question
+            </Button>
+          </>
+        ) : (
+          <div className="space-y-4">
+            <div className="text-sm text-muted-foreground space-y-2">
+              <p>Sample Answer:</p>
+              <p>{question.correctAnswer}</p>
+              {question.explanation && (
+                <>
+                  <p className="mt-2 font-medium">Explanation:</p>
+                  <p>{question.explanation}</p>
+                </>
+              )}
+            </div>
+            <Button
+              className="w-full"
+              onClick={() => onAnswer(true)}
+            >
+              Next Question
+            </Button>
+          </div>
+        )}
       </div>
-
-      {showResult && (
-        <div className="text-sm text-muted-foreground space-y-2">
-          <p>Correct answer:</p>
-          <p>{question.correctAnswer}</p>
-          {question.explanation && (
-            <>
-              <p className="mt-2 font-medium">Explanation:</p>
-              <p>{question.explanation}</p>
-            </>
-          )}
-        </div>
-      )}
     </div>
   );
 }
