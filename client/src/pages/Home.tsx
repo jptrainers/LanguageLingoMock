@@ -15,6 +15,7 @@ interface Unit {
   language: string;
   order: number;
   prerequisiteId: number | null;
+  questionCount: number;
 }
 
 export default function Home() {
@@ -92,6 +93,7 @@ export default function Home() {
                   description={unit.description}
                   difficulty={unit.difficulty}
                   progress={0}
+                  questionCount={unit.questionCount}
                   onClick={() => setSelectedUnit(unit.id)}
                   isSelected={selectedUnit === unit.id}
                 />

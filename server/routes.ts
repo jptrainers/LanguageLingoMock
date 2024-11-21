@@ -50,9 +50,14 @@ export function registerRoutes(app: Express) {
   // Get all units
   app.get("/api/units", async (req, res) => {
     try {
-      const allUnits = await db.query.units.findMany({
-        orderBy: (units) => [units.order],
-      });
+      const allUnits = await db.select({
+        ...units,
+        questionCount: sql<number>`
+          SELECT COUNT(*) 
+          FROM question_units 
+          WHERE unit_id = ${units.id}
+        `
+      }).from(units);
       res.json(allUnits);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";

@@ -41,6 +41,7 @@ interface Unit {
   language: string;
   order: number;
   prerequisiteId: number | null;
+  questionCount: number;
 }
 
 export default function ManageUnits() {
@@ -259,6 +260,7 @@ export default function ManageUnits() {
                 description={unit.description}
                 difficulty={unit.difficulty}
                 progress={0}
+                questionCount={unit.questionCount}
                 onClick={() => {}}
               />
             ))}

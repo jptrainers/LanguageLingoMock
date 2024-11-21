@@ -7,6 +7,7 @@ interface Props {
   description: string;
   difficulty: number;
   progress: number;
+  questionCount?: number;
   isLocked?: boolean;
   isSelected?: boolean;
   onClick?: () => void;
@@ -45,6 +46,12 @@ export default function UnitCard({
               <span className="text-muted-foreground">{Math.round(progress)}%</span>
             </div>
             <Progress value={progress} />
+            {typeof questionCount === 'number' && (
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>{Math.round((progress / 100) * questionCount)}/{questionCount} Questions</span>
+                <span>{questionCount} Questions Total</span>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-1">
