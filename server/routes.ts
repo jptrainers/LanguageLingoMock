@@ -117,21 +117,27 @@ export function registerRoutes(app: Express) {
         .select()
         .from(units)
         .where(eq(units.id, unitId))
+        .limit(1)
         .execute();
 
-      if (!unit) {
+      if (!unit.length) {
         return res.status(404).json({
           error: "Unit not found"
         });
       }
 
       // Get questions for unit using a JOIN query
-      const result = await db.select({
-        question: questions
-      })
-      .from(questionUnits)
-      .innerJoin(questions, eq(questionUnits.questionId, questions.id))
-      .where(eq(questionUnits.unitId, unitId));
+      const result = await db
+        .select({
+          question: questions
+        })
+        .from(questionUnits)
+        .innerJoin(
+          questions,
+          eq(questionUnits.questionId, questions.id)
+        )
+        .where(eq(questionUnits.unitId, unitId))
+        .execute();
 
       const questionsForUnit = result.map(r => r.question);
       
