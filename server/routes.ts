@@ -95,47 +95,36 @@ export function registerRoutes(app: Express) {
       // Validate unitId
       if (isNaN(unitId)) {
         return res.status(400).json({
-          error: "Invalid unit ID",
-          details: "Unit ID must be a number",
-          timestamp: new Date().toISOString()
+          error: "Invalid unit ID"
         });
       }
 
-      // Check if unit exists
+      // First check if unit exists
       const unit = await db.query.units.findFirst({
         where: eq(units.id, unitId)
       });
 
       if (!unit) {
         return res.status(404).json({
-          error: "Unit not found",
-          details: `No unit found with ID ${unitId}`,
-          timestamp: new Date().toISOString()
+          error: "Unit not found"
         });
       }
 
-      // Get questions for unit
-      const questionsInUnit = await db.query.questionUnits.findMany({
-        where: eq(questionUnits.unitId, unitId),
-        with: {
-          question: true
-        }
-      });
+      // Get questions for unit using a JOIN query
+      const result = await db.select({
+        question: questions
+      })
+      .from(questionUnits)
+      .innerJoin(questions, eq(questionUnits.questionId, questions.id))
+      .where(eq(questionUnits.unitId, unitId));
 
-      // Return empty array if no questions found
-      if (!questionsInUnit.length) {
-        console.info(`No questions found for unit ${unitId}`);
-        return res.json([]);
-      }
-
-      res.json(questionsInUnit);
+      const questionsForUnit = result.map(r => r.question);
+      
+      res.json(questionsForUnit);
     } catch (error) {
       console.error("Error fetching questions for unit:", error);
-      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
       res.status(500).json({ 
-        error: "Failed to fetch questions for unit",
-        details: errorMessage,
-        timestamp: new Date().toISOString()
+        error: "Failed to fetch questions for unit"
       });
     }
   });
