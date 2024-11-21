@@ -52,13 +52,10 @@ export default function Lesson() {
   const [score, setScore] = useState(0);
   const [skippedQuestions, setSkippedQuestions] = useState<number[]>([]);
 
-  const { search } = useLocation();
-  const unit = new URLSearchParams(search).get('unit') || 'beginner';
-
   const { data: questions, isLoading, isError } = useQuery({
-    queryKey: ["questions", unit],
+    queryKey: ["questions"],
     queryFn: async () => {
-      const response = await fetch(`/api/questions?unit=${unit}`);
+      const response = await fetch("/api/questions");
       if (!response.ok) {
         throw new Error("Failed to fetch questions");
       }

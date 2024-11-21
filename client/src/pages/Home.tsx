@@ -6,7 +6,6 @@ import { Trophy } from "lucide-react";
 
 export default function Home() {
   const [, setLocation] = useLocation();
-  const [unit, setUnit] = useState('beginner');
 
   return (
     <div className="container mx-auto p-4 max-w-2xl">
@@ -41,33 +40,10 @@ export default function Home() {
         </Card>
 
         <div className="space-y-3">
-          <div className="grid grid-cols-3 gap-2">
-            <Button 
-              variant="outline" 
-              onClick={() => setUnit('beginner')}
-              className={unit === 'beginner' ? 'bg-primary/10' : ''}
-            >
-              Beginner
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => setUnit('intermediate')}
-              className={unit === 'intermediate' ? 'bg-primary/10' : ''}
-            >
-              Intermediate
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => setUnit('advanced')}
-              className={unit === 'advanced' ? 'bg-primary/10' : ''}
-            >
-              Advanced
-            </Button>
-          </div>
           <Button 
             size="lg" 
             className="w-full max-w-md text-lg"
-            onClick={() => setLocation(`/lesson?unit=${unit}`)}
+            onClick={() => setLocation("/lesson")}
           >
             Start Learning
           </Button>
