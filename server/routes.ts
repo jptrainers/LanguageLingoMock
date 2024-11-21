@@ -152,7 +152,8 @@ export function registerRoutes(app: Express) {
       console.log('Question units result:', result);
       const questionsForUnit = result.map(r => r.question);
       
-      res.json(questionsForUnit);
+      // Always return a 200 status, with either the questions or an empty array
+      res.status(200).json(questionsForUnit);
     } catch (error) {
       console.error("Error fetching questions for unit:", error);
       res.status(500).json({ 

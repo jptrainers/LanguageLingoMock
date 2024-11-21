@@ -105,11 +105,23 @@ export default function Lesson() {
 
   // Handle error state
   if (isError || !questions) {
+    const errorMessage = Array.isArray(questions) && questions.length === 0
+      ? "No questions available for this unit yet. Try another unit or check back later."
+      : "Failed to load questions. Please try again later.";
+
     return (
       <div className="container mx-auto p-4">
         <Card className="p-8">
-          <div className="h-40 flex items-center justify-center text-red-500">
-            Failed to load questions. Please try again later.
+          <div className="h-40 flex flex-col items-center justify-center gap-4">
+            <p className="text-lg text-muted-foreground text-center">
+              {errorMessage}
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => window.history.back()}
+            >
+              Go Back
+            </Button>
           </div>
         </Card>
       </div>
