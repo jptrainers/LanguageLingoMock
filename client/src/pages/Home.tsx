@@ -48,14 +48,25 @@ export default function Home() {
             Start Learning
           </Button>
           
-          <Button 
-            size="lg" 
-            variant="outline"
-            className="w-full max-w-md text-lg"
-            onClick={() => setLocation("/create")}
-          >
-            Create Question
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="w-full text-lg"
+              onClick={() => setLocation("/create")}
+            >
+              Create Question
+            </Button>
+            
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="w-full text-lg"
+              onClick={() => setLocation("/manage-units")}
+            >
+              Manage Units
+            </Button>
+          </div>
         </div>
       </div>
     </div>

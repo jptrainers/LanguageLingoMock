@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Home from "./pages/Home";
 import Lesson from "./pages/Lesson";
 import CreateQuestion from "./pages/CreateQuestion";
+import ManageUnits from "./pages/ManageUnits";
 
 function Router() {
   return (
@@ -15,6 +16,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/lesson" component={Lesson} />
       <Route path="/create" component={CreateQuestion} />
+      <Route path="/manage-units" component={ManageUnits} />
       <Route>404 Page Not Found</Route>
     </Switch>
   );
