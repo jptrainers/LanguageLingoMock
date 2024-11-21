@@ -12,37 +12,29 @@ export const units = pgTable("units", {
   language: text("language").notNull(),
   order: integer("order").notNull(),
   prerequisiteId: integer("prerequisite_id").references(() => units.id),
-}) as PgTable<{
-  id: number;
-  name: string;
-  description: string;
-  difficulty: number;
-  language: string;
-  order: number;
-  prerequisiteId: number | null;
-}>;
+});
+
+export const questions = pgTable("questions", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  type: text("type").notNull(),
+  question: text("question").notNull(),
+  correctAnswer: text("correct_answer").notNull(),
+  options: jsonb("options").notNull(),
+  explanation: text("explanation"),
+  difficulty: integer("difficulty").notNull(),
+  language: text("language").notNull(),
+  mediaUrl: text("media_url"),
+  mediaType: text("media_type")
+});
 
 export const questionUnits = pgTable("question_units", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   questionId: integer("question_id").notNull().references(() => questions.id),
   unitId: integer("unit_id").notNull().references(() => units.id),
 });
 
-export const questions = pgTable("questions", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  type: text("type").notNull(), // read-select, fill-blanks, read-aloud, etc.
-  question: text("question").notNull(),
-  correctAnswer: text("correct_answer").notNull(),
-  options: jsonb("options").notNull(), // For read-select: multiple choice options, for speak-photo: [imageUrl, ...vocabulary]
-  explanation: text("explanation"),
-  difficulty: integer("difficulty").notNull(),
-  language: text("language").notNull(),
-  mediaUrl: text("media_url"), // For audio/image based questions
-  mediaType: text("media_type") // audio/image
-});
-
 export const userProgress = pgTable("user_progress", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   userId: integer("user_id").notNull().references(() => users.id),
   questionId: integer("question_id").notNull().references(() => questions.id),
   correct: integer("correct").notNull().default(0),
@@ -51,7 +43,7 @@ export const userProgress = pgTable("user_progress", {
 });
 
 export const users = pgTable("users", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   username: text("username").unique().notNull(),
   password: text("password").notNull(),
   currentStreak: integer("current_streak").notNull().default(0),
