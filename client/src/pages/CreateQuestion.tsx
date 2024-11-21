@@ -93,7 +93,8 @@ const formSchema = z.object({
   explanation: z.string().optional(),
   mediaUrl: z.string().optional(),
   difficulty: z.coerce.number().min(1).max(5),
-  language: z.string().min(1, "Language is required")
+  language: z.string().min(1, "Language is required"),
+  unit: z.string().min(1, "Unit is required")
 }).refine((data) => {
   if (["write-photo", "speak-photo"].includes(data.type)) {
     return !!data.mediaUrl;
@@ -119,7 +120,8 @@ export default function CreateQuestion() {
       explanation: "",
       mediaUrl: "",
       difficulty: 1,
-      language: "en"
+      language: "en",
+      unit: "beginner"
     },
   });
 
@@ -322,6 +324,32 @@ export default function CreateQuestion() {
                         <SelectItem value="en">English</SelectItem>
                         <SelectItem value="es">Spanish</SelectItem>
                         <SelectItem value="fr">French</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="unit"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Unit Level</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select unit level" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="beginner">Beginner</SelectItem>
+                        <SelectItem value="intermediate">Intermediate</SelectItem>
+                        <SelectItem value="advanced">Advanced</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

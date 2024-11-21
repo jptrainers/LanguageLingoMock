@@ -12,7 +12,8 @@ export const questions = pgTable("questions", {
   difficulty: integer("difficulty").notNull(),
   language: text("language").notNull(),
   mediaUrl: text("media_url"), // For audio/image based questions
-  mediaType: text("media_type") // audio/image
+  mediaType: text("media_type"), // audio/image
+  unit: text("unit").notNull().default('beginner')
 });
 
 export const userProgress = pgTable("user_progress", {

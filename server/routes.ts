@@ -21,17 +21,20 @@ export function registerRoutes(app: Express) {
   // Get questions for a lesson
   app.get("/api/questions", async (req, res) => {
     try {
-      // Get one random question from each type
+      const { unit } = req.query;
       const questions = await db.execute<QuestionResult>(sql`
         WITH RECURSIVE distinct_types AS (
           SELECT DISTINCT type FROM questions
+          WHERE unit = ${unit || 'beginner'}
         ),
         random_questions AS (
           SELECT DISTINCT ON (q.type) 
             q.id, q.type, q.question, q.correct_answer as "correctAnswer", 
             q.options, q.explanation, q.difficulty, q.language,
-            q.media_url as "mediaUrl", q.media_type as "mediaType"
+            q.media_url as "mediaUrl", q.media_type as "mediaType",
+            q.unit
           FROM questions q
+          WHERE unit = ${unit || 'beginner'}
           ORDER BY q.type, RANDOM()
         )
         SELECT * FROM random_questions
