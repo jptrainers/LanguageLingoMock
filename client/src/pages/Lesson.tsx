@@ -56,17 +56,35 @@ export default function Lesson() {
   const params = useParams<{ unitId: string }>();
   const unitId = params.unitId;
 
-  const { data: questions, isLoading, isError } = useQuery({
+  const { data: questions, isLoading, isError, error } = useQuery({
     queryKey: ["questions", unitId],
     queryFn: async () => {
+      if (!unitId) {
+        throw new Error("No unit selected");
+      }
+
       const response = await fetch(`/api/units/${unitId}/questions`);
       if (!response.ok) {
-        throw new Error("Failed to fetch questions");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to fetch questions");
       }
+
       const data = await response.json();
+      if (!data.length) {
+        throw new Error("No questions available for this unit");
+      }
+
       return data.map((item: { question: Question }) => item.question);
     },
     enabled: !!unitId,
+    retry: 1,
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to load questions",
+        variant: "destructive",
+      });
+    }
   });
 
   // Handle loading state

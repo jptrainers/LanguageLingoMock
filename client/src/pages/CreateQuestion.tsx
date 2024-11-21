@@ -162,10 +162,18 @@ export default function CreateQuestion() {
       });
 
       if (!response.ok) throw new Error("Failed to create question");
+      const questionData = await response.json();
+
+      // Associate question with unit
+      const associateResponse = await fetch(`/api/questions/${questionData.id}/units/${values.unitId}`, {
+        method: "POST",
+      });
+
+      if (!associateResponse.ok) throw new Error("Failed to associate question with unit");
 
       toast({
         title: "Success",
-        description: "Question created successfully",
+        description: "Question created and associated with unit successfully",
       });
       setLocation("/");
     } catch (error) {
