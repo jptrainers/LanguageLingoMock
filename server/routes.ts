@@ -30,6 +30,23 @@ interface QuestionWithUnit extends QuestionResult {
 }
 
 export function registerRoutes(app: Express) {
+  // Default unit configuration
+  const defaultUnit = {
+    name: "Basic Vocabulary",
+    description: "Learn essential everyday words",
+    difficulty: 1,
+    language: "en",
+    order: 1,
+    prerequisiteId: null
+  };
+
+  // Initialize default unit if none exist
+  db.query.units.findMany().then(async existingUnits => {
+    if (!existingUnits.length) {
+      await db.insert(units).values(defaultUnit);
+    }
+  });
+
   // Get all units
   app.get("/api/units", async (req, res) => {
     try {
@@ -58,7 +75,7 @@ export function registerRoutes(app: Express) {
         language,
         order,
         prerequisiteId
-      }).returning();
+      }).returning() as Unit[];
       res.json(result[0]);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";

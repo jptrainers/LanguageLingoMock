@@ -12,7 +12,15 @@ export const units = pgTable("units", {
   language: text("language").notNull(),
   order: integer("order").notNull(),
   prerequisiteId: integer("prerequisite_id").references(() => units.id),
-});
+}) as PgTable<{
+  id: number;
+  name: string;
+  description: string;
+  difficulty: number;
+  language: string;
+  order: number;
+  prerequisiteId: number | null;
+}>;
 
 export const questionUnits = pgTable("question_units", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
