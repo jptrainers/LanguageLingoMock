@@ -4,8 +4,8 @@ import { z } from "zod";
 
 import type { PgTable } from "drizzle-orm/pg-core";
 
-export const units: PgTable = pgTable("units", {
-  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+export const units = pgTable("units", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   name: text("name").notNull(),
   description: text("description").notNull(),
   difficulty: integer("difficulty").notNull(),

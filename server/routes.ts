@@ -34,7 +34,7 @@ export function registerRoutes(app: Express) {
   app.get("/api/units", async (req, res) => {
     try {
       const allUnits = await db.query.units.findMany({
-        orderBy: units.order,
+        orderBy: (units) => [units.order],
       });
       res.json(allUnits);
     } catch (error) {
