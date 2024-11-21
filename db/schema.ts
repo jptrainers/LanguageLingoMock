@@ -2,6 +2,24 @@ import { pgTable, text, integer, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
+import type { PgTable } from "drizzle-orm/pg-core";
+
+export const units: PgTable = pgTable("units", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  difficulty: integer("difficulty").notNull(),
+  language: text("language").notNull(),
+  order: integer("order").notNull(),
+  prerequisiteId: integer("prerequisite_id").references(() => units.id),
+});
+
+export const questionUnits = pgTable("question_units", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  questionId: integer("question_id").notNull().references(() => questions.id),
+  unitId: integer("unit_id").notNull().references(() => units.id),
+});
+
 export const questions = pgTable("questions", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   type: text("type").notNull(), // read-select, fill-blanks, read-aloud, etc.
@@ -47,3 +65,13 @@ export const insertUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = z.infer<typeof selectUserSchema>;
+
+export const insertUnitSchema = createInsertSchema(units);
+export const selectUnitSchema = createSelectSchema(units);
+export type InsertUnit = z.infer<typeof insertUnitSchema>;
+export type Unit = z.infer<typeof selectUnitSchema>;
+
+export const insertQuestionUnitSchema = createInsertSchema(questionUnits);
+export const selectQuestionUnitSchema = createSelectSchema(questionUnits);
+export type InsertQuestionUnit = z.infer<typeof insertQuestionUnitSchema>;
+export type QuestionUnit = z.infer<typeof selectQuestionUnitSchema>;

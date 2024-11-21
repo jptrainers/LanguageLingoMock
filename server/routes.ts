@@ -1,7 +1,15 @@
 import type { Express } from "express";
 import { db } from "../db";
-import { questions, users, userProgress, type Question } from "@db/schema";
-import { eq, sql } from "drizzle-orm";
+import { 
+  questions, 
+  users, 
+  userProgress, 
+  units, 
+  questionUnits,
+  type Question,
+  type Unit 
+} from "@db/schema";
+import { eq, sql, and } from "drizzle-orm";
 
 interface QuestionResult {
   [key: string]: unknown;
@@ -17,7 +25,90 @@ interface QuestionResult {
   mediaType: string | null;
 }
 
+interface QuestionWithUnit extends QuestionResult {
+  unit?: Unit;
+}
+
 export function registerRoutes(app: Express) {
+  // Get all units
+  app.get("/api/units", async (req, res) => {
+    try {
+      const allUnits = await db.query.units.findMany({
+        orderBy: units.order,
+      });
+      res.json(allUnits);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      res.status(500).json({ 
+        error: "Failed to fetch units",
+        details: errorMessage,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Create a new unit
+  app.post("/api/units", async (req, res) => {
+    try {
+      const { name, description, difficulty, language, order, prerequisiteId } = req.body;
+      const result = await db.insert(units).values({
+        name,
+        description,
+        difficulty,
+        language,
+        order,
+        prerequisiteId
+      }).returning();
+      res.json(result[0]);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      res.status(500).json({ 
+        error: "Failed to create unit",
+        details: errorMessage,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Get questions by unit
+  app.get("/api/units/:unitId/questions", async (req, res) => {
+    try {
+      const unitId = parseInt(req.params.unitId);
+      const questionsInUnit = await db.query.questionUnits.findMany({
+        where: eq(questionUnits.unitId, unitId),
+        with: {
+          question: true
+        }
+      });
+      res.json(questionsInUnit);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      res.status(500).json({ 
+        error: "Failed to fetch questions for unit",
+        details: errorMessage,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Associate question with unit
+  app.post("/api/questions/:questionId/units/:unitId", async (req, res) => {
+    try {
+      const { questionId, unitId } = req.params;
+      const result = await db.insert(questionUnits).values({
+        questionId: parseInt(questionId),
+        unitId: parseInt(unitId)
+      }).returning();
+      res.json(result[0]);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      res.status(500).json({ 
+        error: "Failed to associate question with unit",
+        details: errorMessage,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
   // Get questions for a lesson
   app.get("/api/questions", async (req, res) => {
     try {

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -82,7 +82,18 @@ const getCorrectAnswerLabel = (type: string) => {
   }
 };
 
+interface Unit {
+  id: number;
+  name: string;
+  description: string;
+  difficulty: number;
+  language: string;
+  order: number;
+  prerequisiteId: number | null;
+}
+
 const formSchema = z.object({
+  unitId: z.coerce.number().min(1, "Unit is required"),
   type: z.string().min(1, "Question type is required"),
   question: z.string().min(1, "Question text is required"),
   correctAnswer: z.string().optional().transform(val => val || ""),
@@ -108,6 +119,18 @@ export default function CreateQuestion() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [units, setUnits] = useState<Unit[]>([]);
+
+  useEffect(() => {
+    fetch("/api/units")
+      .then(res => res.json())
+      .then(data => setUnits(data))
+      .catch(() => toast({
+        title: "Error",
+        description: "Failed to load units",
+        variant: "destructive",
+      }));
+  }, [toast]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
