@@ -46,15 +46,62 @@ const questionTypes = {
   "summarize-conversation": "Summarize the Conversation"
 };
 
+const getOptionsHelp = (type: string) => {
+  switch(type) {
+    case "read-select":
+    case "read-complete":
+    case "identify-idea":
+      return "Enter multiple choice options separated by commas";
+    case "fill-blanks":
+      return "Enter the word or phrase to fill in the blank";
+    case "write-photo":
+    case "speak-photo":
+      return "Enter image URL followed by vocabulary words, separated by commas";
+    case "listen-type":
+    case "listen-speak":
+      return "Enter audio text followed by key phrases, separated by commas";
+    case "highlight-answer":
+      return "Enter text to highlight";
+    case "interactive-writing":
+    case "summarize-conversation":
+      return "Enter key points separated by commas";
+    default:
+      return "Enter options separated by commas";
+  }
+};
+
+const getCorrectAnswerLabel = (type: string) => {
+  switch(type) {
+    case "write-photo":
+    case "speak-photo":
+    case "interactive-writing":
+    case "summarize-conversation":
+      return "Sample Answer";
+    default:
+      return "Correct Answer";
+  }
+};
+
 const formSchema = z.object({
   type: z.string().min(1, "Question type is required"),
   question: z.string().min(1, "Question text is required"),
-  correctAnswer: z.string().min(1, "Correct answer is required"),
-  options: z.string().min(1, "Options are required"),
+  correctAnswer: z.string().optional().transform(val => val || ""),
+  options: z.string().refine((val) => {
+    const options = val.split(",").map(opt => opt.trim());
+    return options.length >= 2;
+  }, "At least two options are required"),
   explanation: z.string().optional(),
   mediaUrl: z.string().optional(),
   difficulty: z.coerce.number().min(1).max(5),
   language: z.string().min(1, "Language is required")
+}).refine((data) => {
+  if (["write-photo", "speak-photo"].includes(data.type)) {
+    return !!data.mediaUrl;
+  }
+  return true;
+}, {
+  message: "Media URL is required for photo-based questions",
+  path: ["mediaUrl"]
 });
 
 export default function CreateQuestion() {
@@ -175,7 +222,7 @@ export default function CreateQuestion() {
                     <FormLabel>Options</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Enter options separated by commas"
+                        placeholder={getOptionsHelp(selectedType)}
                         {...field}
                       />
                     </FormControl>
@@ -189,10 +236,10 @@ export default function CreateQuestion() {
                 name="correctAnswer"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Correct Answer</FormLabel>
+                    <FormLabel>{getCorrectAnswerLabel(selectedType)}</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter the correct answer"
+                        placeholder={`Enter the ${getCorrectAnswerLabel(selectedType).toLowerCase()}`}
                         {...field}
                       />
                     </FormControl>
