@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -53,38 +52,16 @@ export default function Lesson() {
   const [score, setScore] = useState(0);
   const [skippedQuestions, setSkippedQuestions] = useState<number[]>([]);
 
-  const params = useParams<{ unitId: string }>();
-  const unitId = params.unitId;
-
-  const { data: questions, isLoading, isError, error } = useQuery({
-    queryKey: ["questions", unitId],
+  const { data: questions, isLoading, isError } = useQuery({
+    queryKey: ["questions"],
     queryFn: async () => {
-      if (!unitId) {
-        throw new Error("No unit selected");
-      }
-
-      const response = await fetch(`/api/units/${unitId}/questions`);
+      const response = await fetch("/api/questions");
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to fetch questions");
+        throw new Error("Failed to fetch questions");
       }
-
       const data = await response.json();
-      if (!data.length) {
-        throw new Error("No questions available for this unit");
-      }
-
-      return data.map((item: { question: Question }) => item.question);
+      return data;
     },
-    enabled: !!unitId,
-    retry: 1,
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to load questions",
-        variant: "destructive",
-      });
-    }
   });
 
   // Handle loading state
@@ -105,23 +82,11 @@ export default function Lesson() {
 
   // Handle error state
   if (isError || !questions) {
-    const errorMessage = Array.isArray(questions) && questions.length === 0
-      ? "No questions available for this unit yet. Try another unit or check back later."
-      : "Failed to load questions. Please try again later.";
-
     return (
       <div className="container mx-auto p-4">
         <Card className="p-8">
-          <div className="h-40 flex flex-col items-center justify-center gap-4">
-            <p className="text-lg text-muted-foreground text-center">
-              {errorMessage}
-            </p>
-            <Button
-              variant="outline"
-              onClick={() => window.history.back()}
-            >
-              Go Back
-            </Button>
+          <div className="h-40 flex items-center justify-center text-red-500">
+            Failed to load questions. Please try again later.
           </div>
         </Card>
       </div>

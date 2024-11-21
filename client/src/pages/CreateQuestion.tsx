@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -82,18 +82,7 @@ const getCorrectAnswerLabel = (type: string) => {
   }
 };
 
-interface Unit {
-  id: number;
-  name: string;
-  description: string;
-  difficulty: number;
-  language: string;
-  order: number;
-  prerequisiteId: number | null;
-}
-
 const formSchema = z.object({
-  unitId: z.coerce.number().min(1, "Unit is required"),
   type: z.string().min(1, "Question type is required"),
   question: z.string().min(1, "Question text is required"),
   correctAnswer: z.string().optional().transform(val => val || ""),
@@ -119,18 +108,6 @@ export default function CreateQuestion() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [units, setUnits] = useState<Unit[]>([]);
-
-  useEffect(() => {
-    fetch("/api/units")
-      .then(res => res.json())
-      .then(data => setUnits(data))
-      .catch(() => toast({
-        title: "Error",
-        description: "Failed to load units",
-        variant: "destructive",
-      }));
-  }, [toast]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -162,18 +139,10 @@ export default function CreateQuestion() {
       });
 
       if (!response.ok) throw new Error("Failed to create question");
-      const questionData = await response.json();
-
-      // Associate question with unit
-      const associateResponse = await fetch(`/api/questions/${questionData.id}/units/${values.unitId}`, {
-        method: "POST",
-      });
-
-      if (!associateResponse.ok) throw new Error("Failed to associate question with unit");
 
       toast({
         title: "Success",
-        description: "Question created and associated with unit successfully",
+        description: "Question created successfully",
       });
       setLocation("/");
     } catch (error) {
@@ -200,34 +169,6 @@ export default function CreateQuestion() {
         <Card className="p-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="unitId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Unit</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value?.toString()}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select unit" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {units.map((unit) => (
-                          <SelectItem key={unit.id} value={unit.id.toString()}>
-                            {unit.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
               <FormField
                 control={form.control}
                 name="type"

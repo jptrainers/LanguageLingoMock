@@ -2,39 +2,21 @@ import { pgTable, text, integer, timestamp, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-import type { PgTable } from "drizzle-orm/pg-core";
-
-export const units = pgTable("units", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  name: text("name").notNull(),
-  description: text("description").notNull(),
-  difficulty: integer("difficulty").notNull(),
-  language: text("language").notNull(),
-  order: integer("order").notNull(),
-  prerequisiteId: integer("prerequisite_id").references(() => units.id),
-});
-
 export const questions = pgTable("questions", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  type: text("type").notNull(),
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  type: text("type").notNull(), // read-select, fill-blanks, read-aloud, etc.
   question: text("question").notNull(),
   correctAnswer: text("correct_answer").notNull(),
-  options: jsonb("options").notNull(),
+  options: jsonb("options").notNull(), // For read-select: multiple choice options, for speak-photo: [imageUrl, ...vocabulary]
   explanation: text("explanation"),
   difficulty: integer("difficulty").notNull(),
   language: text("language").notNull(),
-  mediaUrl: text("media_url"),
-  mediaType: text("media_type")
-});
-
-export const questionUnits = pgTable("question_units", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  questionId: integer("question_id").notNull().references(() => questions.id),
-  unitId: integer("unit_id").notNull().references(() => units.id),
+  mediaUrl: text("media_url"), // For audio/image based questions
+  mediaType: text("media_type") // audio/image
 });
 
 export const userProgress = pgTable("user_progress", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
   userId: integer("user_id").notNull().references(() => users.id),
   questionId: integer("question_id").notNull().references(() => questions.id),
   correct: integer("correct").notNull().default(0),
@@ -43,7 +25,7 @@ export const userProgress = pgTable("user_progress", {
 });
 
 export const users = pgTable("users", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
   username: text("username").unique().notNull(),
   password: text("password").notNull(),
   currentStreak: integer("current_streak").notNull().default(0),
@@ -65,13 +47,3 @@ export const insertUserSchema = createInsertSchema(users);
 export const selectUserSchema = createSelectSchema(users);
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = z.infer<typeof selectUserSchema>;
-
-export const insertUnitSchema = createInsertSchema(units);
-export const selectUnitSchema = createSelectSchema(units);
-export type InsertUnit = z.infer<typeof insertUnitSchema>;
-export type Unit = z.infer<typeof selectUnitSchema>;
-
-export const insertQuestionUnitSchema = createInsertSchema(questionUnits);
-export const selectQuestionUnitSchema = createSelectSchema(questionUnits);
-export type InsertQuestionUnit = z.infer<typeof insertQuestionUnitSchema>;
-export type QuestionUnit = z.infer<typeof selectQuestionUnitSchema>;
