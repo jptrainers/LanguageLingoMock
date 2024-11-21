@@ -39,13 +39,24 @@ export default function Home() {
           </CardContent>
         </Card>
 
-        <Button 
-          size="lg" 
-          className="w-full max-w-md text-lg"
-          onClick={() => setLocation("/lesson")}
-        >
-          Start Learning
-        </Button>
+        <div className="space-y-3">
+          <Button 
+            size="lg" 
+            className="w-full max-w-md text-lg"
+            onClick={() => setLocation("/lesson")}
+          >
+            Start Learning
+          </Button>
+          
+          <Button 
+            size="lg" 
+            variant="outline"
+            className="w-full max-w-md text-lg"
+            onClick={() => setLocation("/create")}
+          >
+            Create Question
+          </Button>
+        </div>
       </div>
     </div>
   );

@@ -7,12 +7,14 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import Home from "./pages/Home";
 import Lesson from "./pages/Lesson";
+import CreateQuestion from "./pages/CreateQuestion";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/lesson" component={Lesson} />
+      <Route path="/create" component={CreateQuestion} />
       <Route>404 Page Not Found</Route>
     </Switch>
   );

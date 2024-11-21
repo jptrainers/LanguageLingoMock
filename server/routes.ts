@@ -88,4 +88,43 @@ export function registerRoutes(app: Express) {
       });
     }
   });
+
+  // Create a new question
+  app.post("/api/questions", async (req, res) => {
+    try {
+      const { type, question, correctAnswer, options, explanation, mediaUrl, difficulty, language } = req.body;
+
+      // Validate required fields
+      if (!type || !question || !correctAnswer || !options || !Array.isArray(options)) {
+        return res.status(400).json({
+          error: "Invalid input",
+          details: "Required fields are missing or invalid",
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      // Insert the question
+      const result = await db.insert(questions).values({
+        type,
+        question,
+        correctAnswer,
+        options,
+        explanation: explanation || null,
+        mediaUrl: mediaUrl || null,
+        mediaType: mediaUrl ? (mediaUrl.match(/\.(jpg|jpeg|png|gif)$/i) ? 'image' : 'audio') : null,
+        difficulty: difficulty || 1,
+        language: language || 'en'
+      }).returning();
+
+      res.json(result[0]);
+    } catch (error) {
+      console.error("Error creating question:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      res.status(500).json({
+        error: "Failed to create question",
+        details: errorMessage,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
 }
