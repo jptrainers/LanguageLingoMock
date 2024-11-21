@@ -50,15 +50,23 @@ export function registerRoutes(app: Express) {
   // Get all units
   app.get("/api/units", async (req, res) => {
     try {
-      const allUnits = await db.select({
-        ...units,
-        questionCount: sql<number>`
-          SELECT COUNT(*) 
-          FROM question_units 
-          WHERE unit_id = ${units.id}
-        `
-      }).from(units);
-      res.json(allUnits);
+      const allUnits = await db
+        .select()
+        .from(units)
+        .execute();
+
+      // Add question count for each unit
+      const unitsWithCount = await Promise.all(
+        allUnits.map(async (unit) => {
+          const count = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(questionUnits)
+            .where(eq(questionUnits.unitId, unit.id))
+            .execute();
+          return { ...unit, questionCount: count[0]?.count ?? 0 };
+        })
+      );
+      res.json(unitsWithCount);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
       res.status(500).json({ 
@@ -105,9 +113,11 @@ export function registerRoutes(app: Express) {
       }
 
       // First check if unit exists
-      const unit = await db.query.units.findFirst({
-        where: eq(units.id, unitId)
-      });
+      const unit = await db
+        .select()
+        .from(units)
+        .where(eq(units.id, unitId))
+        .execute();
 
       if (!unit) {
         return res.status(404).json({
