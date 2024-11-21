@@ -14,7 +14,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/lesson" component={Lesson} />
+      <Route path="/lesson/:unitId" component={Lesson} />
       <Route path="/create" component={CreateQuestion} />
       <Route path="/manage-units" component={ManageUnits} />
       <Route>404 Page Not Found</Route>

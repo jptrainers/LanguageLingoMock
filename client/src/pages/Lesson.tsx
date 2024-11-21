@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useParams } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -52,16 +53,20 @@ export default function Lesson() {
   const [score, setScore] = useState(0);
   const [skippedQuestions, setSkippedQuestions] = useState<number[]>([]);
 
+  const params = useParams<{ unitId: string }>();
+  const unitId = params.unitId;
+
   const { data: questions, isLoading, isError } = useQuery({
-    queryKey: ["questions"],
+    queryKey: ["questions", unitId],
     queryFn: async () => {
-      const response = await fetch("/api/questions");
+      const response = await fetch(`/api/units/${unitId}/questions`);
       if (!response.ok) {
         throw new Error("Failed to fetch questions");
       }
       const data = await response.json();
-      return data;
+      return data.map((item: { question: Question }) => item.question);
     },
+    enabled: !!unitId,
   });
 
   // Handle loading state

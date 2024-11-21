@@ -8,6 +8,7 @@ interface Props {
   difficulty: number;
   progress: number;
   isLocked?: boolean;
+  isSelected?: boolean;
   onClick?: () => void;
 }
 
@@ -17,11 +18,12 @@ export default function UnitCard({
   difficulty, 
   progress, 
   isLocked = false,
+  isSelected = false,
   onClick 
 }: Props) {
   return (
     <Card 
-      className={`transition-all hover:shadow-lg ${!isLocked && 'cursor-pointer hover:scale-[1.02]'}`}
+      className={`transition-all hover:shadow-lg ${!isLocked && 'cursor-pointer hover:scale-[1.02]'} ${isSelected ? 'ring-2 ring-primary' : ''}`}
       onClick={!isLocked ? onClick : undefined}
     >
       <CardHeader>
