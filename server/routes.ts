@@ -112,9 +112,19 @@ export function registerRoutes(app: Express) {
         });
       }
 
+      console.log('Fetching questions for unit:', unitId);
+
       // First check if unit exists
       const unit = await db
-        .select()
+        .select({
+          id: units.id,
+          name: units.name,
+          description: units.description,
+          difficulty: units.difficulty,
+          language: units.language,
+          order: units.order,
+          prerequisiteId: units.prerequisiteId
+        })
         .from(units)
         .where(eq(units.id, unitId))
         .limit(1)
@@ -139,6 +149,7 @@ export function registerRoutes(app: Express) {
         .where(eq(questionUnits.unitId, unitId))
         .execute();
 
+      console.log('Question units result:', result);
       const questionsForUnit = result.map(r => r.question);
       
       res.json(questionsForUnit);
